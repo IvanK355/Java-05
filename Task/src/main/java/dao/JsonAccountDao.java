@@ -25,7 +25,7 @@ public class JsonAccountDao implements Dao<Account> {
 
         HashMap<Integer, Account> balanceHashMap = readJson();
         String holder = balanceHashMap.get(id).getHolder();
-        int amount = balanceHashMap.get(id).getAmountOperation();
+        int amount = balanceHashMap.get(id).getAccountAmount();
         return new Account(id, holder, amount);
 
     }
@@ -35,7 +35,7 @@ public class JsonAccountDao implements Dao<Account> {
     public Account deposit(int id, int amount) throws IOException {
         HashMap<Integer, Account> balanceHashMap = readJson();
         String holder = balanceHashMap.get(id).getHolder();
-        int EndAmount = balanceHashMap.get(id).getAmountOperation() + amount;
+        int EndAmount = balanceHashMap.get(id).getAccountAmount() + amount;
         Account account = new Account(id, holder, EndAmount);
         balanceHashMap.put(id, account);
         writeJson(balanceHashMap);
@@ -46,7 +46,7 @@ public class JsonAccountDao implements Dao<Account> {
     public Account withdraw(int id, int amount) throws IOException {
         HashMap<Integer, Account> balanceHashMap = readJson();
         String holder = balanceHashMap.get(id).getHolder();
-        int EndAmount = balanceHashMap.get(id).getAmountOperation() - amount;
+        int EndAmount = balanceHashMap.get(id).getAccountAmount() - amount;
         Account account = new Account(id, holder, EndAmount);
         balanceHashMap.put(id, account);
         writeJson(balanceHashMap);

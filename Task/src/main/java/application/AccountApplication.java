@@ -4,7 +4,6 @@ import dao.Dao;
 import entities.Account;
 import factory.BdTypes;
 import factory.AccountFactory;
-
 import java.io.IOException;
 import java.sql.SQLException;
 
@@ -12,7 +11,7 @@ public class AccountApplication {
 
     public static void main(String[] args) throws SQLException, IOException {
         AccountFactory factory = new AccountFactory();
-        Dao <Account> accountService = factory.getBdType(BdTypes.JSON);
+        Dao <Account> accountService = factory.getBdType(BdTypes.JPA);
         accountService.createNewTable();
         Account account1 = accountService.balance(1);
         Account account2 = accountService.deposit(1,100);

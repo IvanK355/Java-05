@@ -1,22 +1,36 @@
 package entities;
 
+import javax.persistence.*;
+
+@Entity
+@Table(name = "accounts")
+
 public class Account {
 
+    @Id
+    @GeneratedValue(strategy = GenerationType.AUTO)
     private int id;
     private String holder;
-    private int amountOperation;
+    private int accountAmount;
 
 
     public Account(int id, String holder, int amountOperation) {
         this.id = id;
         this.holder = holder;
-        this.amountOperation = amountOperation;
+        this.accountAmount = amountOperation;
     }
 
+    public Account(String holder, int accountAmount) {
+        this.holder = holder;
+        this.accountAmount = accountAmount;
+    }
+
+    public Account() {
+    }
 
     public String toString() {
         return id + " : " + holder + " : "
-                + " Сумма на счете: " + amountOperation;
+                + " Сумма на счете: " + accountAmount;
     }
 
     public int getId() {
@@ -35,11 +49,11 @@ public class Account {
         this.holder = holder;
     }
 
-    public int getAmountOperation() {
-        return amountOperation;
+    public int getAccountAmount() {
+        return accountAmount;
     }
 
-    public void setAmountOperation(int amountOperation) {
-        this.amountOperation = amountOperation;
+    public void setAccountAmount(int accountAmount) {
+        this.accountAmount = accountAmount;
     }
 }
