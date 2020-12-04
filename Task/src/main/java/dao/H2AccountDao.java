@@ -17,8 +17,6 @@ public class H2AccountDao implements Dao<Account> {
 
     @Override
     public void createNewTable() {
-        //DriverManager
-        //      .getConnection("jdbc:h2:mem:ACCOUNT;DB_CLOSE_DELAY=-1;INIT=RUNSCRIPT FROM './Task/src/main/resources/data/schema.sql'\\;RUNSCRIPT FROM './Task/src/main/resources/data/data.sql'");
         DbcpDataSource.getConnection();
     }
 
@@ -27,9 +25,6 @@ public class H2AccountDao implements Dao<Account> {
         Connection connection;
         PreparedStatement preparedStatement;
         ResultSet resultSet;
-
-        //connection = DriverManager
-        //        .getConnection("jdbc:h2:mem:ACCOUNT");
         connection = DbcpDataSource.getConnection();
 
         preparedStatement = connection.prepareStatement(SELECT_QUERY);
@@ -41,10 +36,9 @@ public class H2AccountDao implements Dao<Account> {
             name = resultSet.getString(2);
             amount = resultSet.getInt(3);
         }
-        Account account = new Account(id, name, amount);
         preparedStatement.close();
         connection.close();
-        return account;
+        return new Account(id, name, amount);
     }
 
     @Override
@@ -59,7 +53,7 @@ public class H2AccountDao implements Dao<Account> {
         preparedStatement.executeUpdate();
         preparedStatement.close();
         connection.close();
-    return balance(id);
+        return balance(id);
     }
 
     @Override
