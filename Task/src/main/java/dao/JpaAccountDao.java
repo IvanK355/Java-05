@@ -1,6 +1,8 @@
 package dao;
 
 import entities.Account;
+import service.NotEnoughMoneyException;
+
 import javax.persistence.*;
 
 public class JpaAccountDao implements Dao<Account> {
@@ -44,9 +46,13 @@ public class JpaAccountDao implements Dao<Account> {
     }
 
     @Override
-    public Account withdraw(int id, int amount) {
+    public Account withdraw(int id, int amount) throws NotEnoughMoneyException {
         EntityManager em = emf.createEntityManager();
         em.getTransaction().begin();
+        Account account = balance(id);
+        if((account.getAccountAmount()-amount)<0) {
+            throw new NotEnoughMoneyException("Исключение создано в JPA метод withdraw");
+        }
 
         Query query = em.createQuery(UPDATE_WITHDRAW_QUERY);
         query.setParameter("increment", amount);
@@ -59,7 +65,7 @@ public class JpaAccountDao implements Dao<Account> {
     }
 
     @Override
-    public void transfer(int id1, int id2, int amount){
+    public void transfer(int id1, int id2, int amount) throws NotEnoughMoneyException {
         withdraw(id1, amount);
         deposit(id2, amount);
     }

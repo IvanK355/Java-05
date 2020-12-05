@@ -3,8 +3,10 @@ package service.impl;
 import dao.JsonAccountDao;
 import entities.Account;
 import service.BankService;
+import service.NotEnoughMoneyException;
 
 import java.io.IOException;
+import java.sql.SQLException;
 
 public class JsonService implements BankService {
     private final JsonAccountDao accountDao = new JsonAccountDao();
@@ -26,13 +28,19 @@ public class JsonService implements BankService {
     }
 
     @Override
-    public Account withdraw(int id, int amount) throws IOException {
-        return accountDao.withdraw(id, amount);
+    public Account withdraw(int id, int amount) throws NotEnoughMoneyException, IOException {
+        try {
+            return accountDao.withdraw(id, amount);
+        } catch (NotEnoughMoneyException | IOException e) {
+            e.printStackTrace();
+            System.out.println("Недостаточно средств на счете. Введите новую сумму.");
 
+        }
+        return accountDao.withdraw(id, amount);
     }
 
     @Override
-    public void transfer(int id1, int id2, int amount) throws IOException {
+    public void transfer(int id1, int id2, int amount) throws IOException, NotEnoughMoneyException {
         accountDao.transfer(id1, id2, amount);
     }
 }

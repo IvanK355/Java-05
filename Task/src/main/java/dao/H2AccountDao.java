@@ -1,6 +1,7 @@
 package dao;
 
 import entities.Account;
+import service.NotEnoughMoneyException;
 import utils.DbcpDataSource;
 
 import java.sql.Connection;
@@ -45,7 +46,6 @@ public class H2AccountDao implements Dao<Account> {
     public Account deposit(int id, int amount) throws SQLException {
         Connection connection;
         PreparedStatement preparedStatement;
-
         connection = DbcpDataSource.getConnection();
         preparedStatement = connection.prepareStatement(UPDATE_DEPOSIT_QUERY);
         preparedStatement.setInt(1, amount);
@@ -57,9 +57,13 @@ public class H2AccountDao implements Dao<Account> {
     }
 
     @Override
-    public Account withdraw(int id, int amount) throws SQLException {
+    public Account withdraw(int id, int amount) throws SQLException, NotEnoughMoneyException {
         Connection connection;
         PreparedStatement preparedStatement;
+        Account account = balance(id);
+        if((account.getAccountAmount()-amount)<0) {
+            throw new NotEnoughMoneyException("Исключение создано в H2 метод withdraw");
+        }
 
         connection = DbcpDataSource.getConnection();
         preparedStatement = connection.prepareStatement(UPDATE_WITHDRAW_QUERY);
@@ -72,7 +76,7 @@ public class H2AccountDao implements Dao<Account> {
     }
 
     @Override
-    public void transfer(int id1, int id2, int amount) throws SQLException {
+    public void transfer(int id1, int id2, int amount) throws SQLException, NotEnoughMoneyException {
         withdraw(id1, amount);
         deposit(id2, amount);
 

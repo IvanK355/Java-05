@@ -3,6 +3,7 @@ package dao;
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
 import entities.Account;
+import service.NotEnoughMoneyException;
 
 import java.io.BufferedReader;
 import java.io.FileReader;
@@ -43,10 +44,13 @@ public class JsonAccountDao implements Dao<Account> {
     }
 
     @Override
-    public Account withdraw(int id, int amount) throws IOException {
+    public Account withdraw(int id, int amount) throws IOException, NotEnoughMoneyException {
         HashMap<Integer, Account> balanceHashMap = readJson();
         String holder = balanceHashMap.get(id).getHolder();
         int EndAmount = balanceHashMap.get(id).getAccountAmount() - amount;
+        if (EndAmount < 0) {
+            throw new NotEnoughMoneyException("Исключение создано в JSON метод withdraw");
+        }
         Account account = new Account(id, holder, EndAmount);
         balanceHashMap.put(id, account);
         writeJson(balanceHashMap);
@@ -54,7 +58,7 @@ public class JsonAccountDao implements Dao<Account> {
     }
 
     @Override
-    public void transfer(int id1, int id2, int amount) throws IOException {
+    public void transfer(int id1, int id2, int amount) throws IOException, NotEnoughMoneyException {
 
         withdraw(id1, amount);
         deposit(id2, amount);
