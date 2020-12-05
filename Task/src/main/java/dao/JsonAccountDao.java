@@ -4,6 +4,7 @@ import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
 import entities.Account;
 import service.NotEnoughMoneyException;
+import service.UnknownAccountException;
 
 import java.io.BufferedReader;
 import java.io.FileReader;
@@ -22,18 +23,22 @@ public class JsonAccountDao implements Dao<Account> {
 
     @Override
 
-    public Account balance(int id) throws IOException {
+    public Account balance(int id) throws IOException, UnknownAccountException {
 
         HashMap<Integer, Account> balanceHashMap = readJson();
-        String holder = balanceHashMap.get(id).getHolder();
-        int amount = balanceHashMap.get(id).getAccountAmount();
-        return new Account(id, holder, amount);
-
+        try {
+            String holder = balanceHashMap.get(id).getHolder();
+            int amount = balanceHashMap.get(id).getAccountAmount();
+            return new Account(id, holder, amount);
+        } catch (Exception e){
+            throw new UnknownAccountException("Исключение создано в JSON метод balance");
+        }
     }
 
     @Override
 
-    public Account deposit(int id, int amount) throws IOException {
+    public Account deposit(int id, int amount) throws IOException, UnknownAccountException {
+        balance(id);
         HashMap<Integer, Account> balanceHashMap = readJson();
         String holder = balanceHashMap.get(id).getHolder();
         int EndAmount = balanceHashMap.get(id).getAccountAmount() + amount;
@@ -44,7 +49,8 @@ public class JsonAccountDao implements Dao<Account> {
     }
 
     @Override
-    public Account withdraw(int id, int amount) throws IOException, NotEnoughMoneyException {
+    public Account withdraw(int id, int amount) throws IOException, NotEnoughMoneyException, UnknownAccountException {
+        balance(id);
         HashMap<Integer, Account> balanceHashMap = readJson();
         String holder = balanceHashMap.get(id).getHolder();
         int EndAmount = balanceHashMap.get(id).getAccountAmount() - amount;
@@ -58,8 +64,9 @@ public class JsonAccountDao implements Dao<Account> {
     }
 
     @Override
-    public void transfer(int id1, int id2, int amount) throws IOException, NotEnoughMoneyException {
-
+    public void transfer(int id1, int id2, int amount) throws IOException, NotEnoughMoneyException, UnknownAccountException {
+        balance(id1);
+        balance(id2);
         withdraw(id1, amount);
         deposit(id2, amount);
     }

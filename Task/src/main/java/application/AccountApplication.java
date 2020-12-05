@@ -17,7 +17,7 @@ public class AccountApplication {
         Dao <Account> accountService = factory.getBdType(BdTypes.JSON);
         accountService.createNewTable();
         Account account1 = accountService.balance(1);
-        Account account2 = accountService.deposit(1,100);
+        Account account2 = accountService.deposit(12,100);
         Account account3 = accountService.withdraw(1,100);
         accountService.transfer(1,2,100);
         Account account4 = accountService.balance(1);
