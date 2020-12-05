@@ -2,6 +2,7 @@ package dao;
 
 import entities.Account;
 import service.NotEnoughMoneyException;
+import service.UnknownAccountException;
 
 import javax.persistence.*;
 
@@ -23,14 +24,19 @@ public class JpaAccountDao implements Dao<Account> {
         em.close();
     }
 
-    public Account balance(int id) {
+    public Account balance(int id) throws UnknownAccountException {
 
         EntityManager em = emf.createEntityManager();
-        return em.find(Account.class, id);
+        Account account = em.find(Account.class, id);
+        if(account==null){
+            throw new UnknownAccountException("Исключение создано в JPA метод balance");
+        }
+        return account;
     }
 
     @Override
-    public Account deposit(int id, int amount)  {
+    public Account deposit(int id, int amount) throws UnknownAccountException {
+        balance(id);
 
         EntityManager em = emf.createEntityManager();
         em.getTransaction().begin();
@@ -46,7 +52,8 @@ public class JpaAccountDao implements Dao<Account> {
     }
 
     @Override
-    public Account withdraw(int id, int amount) throws NotEnoughMoneyException {
+    public Account withdraw(int id, int amount) throws NotEnoughMoneyException, UnknownAccountException {
+        balance(id);
         EntityManager em = emf.createEntityManager();
         em.getTransaction().begin();
         Account account = balance(id);
@@ -65,7 +72,9 @@ public class JpaAccountDao implements Dao<Account> {
     }
 
     @Override
-    public void transfer(int id1, int id2, int amount) throws NotEnoughMoneyException {
+    public void transfer(int id1, int id2, int amount) throws NotEnoughMoneyException, UnknownAccountException {
+        balance(id1);
+        balance(id2);
         withdraw(id1, amount);
         deposit(id2, amount);
     }
