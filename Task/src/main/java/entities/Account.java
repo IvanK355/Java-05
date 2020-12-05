@@ -24,8 +24,8 @@ public class Account {
         this.holder = holder;
         this.accountAmount = accountAmount;
     }
+    public Account(){
 
-    public Account() {
     }
 
     public String toString() {

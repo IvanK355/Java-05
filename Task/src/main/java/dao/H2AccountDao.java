@@ -2,6 +2,7 @@ package dao;
 
 import entities.Account;
 import service.NotEnoughMoneyException;
+import service.UnknownAccountException;
 import utils.DbcpDataSource;
 
 import java.sql.Connection;
@@ -22,7 +23,7 @@ public class H2AccountDao implements Dao<Account> {
     }
 
     @Override
-    public Account balance(int id) throws SQLException {
+    public Account balance(int id) throws SQLException, UnknownAccountException {
         Connection connection;
         PreparedStatement preparedStatement;
         ResultSet resultSet;
@@ -39,11 +40,16 @@ public class H2AccountDao implements Dao<Account> {
         }
         preparedStatement.close();
         connection.close();
-        return new Account(id, name, amount);
+        Account account =new Account(id, name, amount);
+        if (name==null){
+            throw new UnknownAccountException("Исключение создано в H2 метод balance");
+        }
+        return account;
     }
 
     @Override
-    public Account deposit(int id, int amount) throws SQLException {
+    public Account deposit(int id, int amount) throws SQLException, UnknownAccountException {
+        balance(id);
         Connection connection;
         PreparedStatement preparedStatement;
         connection = DbcpDataSource.getConnection();
@@ -57,7 +63,8 @@ public class H2AccountDao implements Dao<Account> {
     }
 
     @Override
-    public Account withdraw(int id, int amount) throws SQLException, NotEnoughMoneyException {
+    public Account withdraw(int id, int amount) throws SQLException, NotEnoughMoneyException, UnknownAccountException {
+        balance(id);
         Connection connection;
         PreparedStatement preparedStatement;
         Account account = balance(id);
@@ -76,7 +83,9 @@ public class H2AccountDao implements Dao<Account> {
     }
 
     @Override
-    public void transfer(int id1, int id2, int amount) throws SQLException, NotEnoughMoneyException {
+    public void transfer(int id1, int id2, int amount) throws SQLException, NotEnoughMoneyException, UnknownAccountException {
+        balance(id1);
+        balance(id2);
         withdraw(id1, amount);
         deposit(id2, amount);
 

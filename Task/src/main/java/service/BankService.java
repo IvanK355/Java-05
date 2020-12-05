@@ -8,8 +8,8 @@ import java.sql.SQLException;
 
 public interface BankService extends Dao <Account> {
     void createNewTable() throws IOException;
-    Account balance(int id) throws SQLException, IOException;
-    Account deposit(int id, int amount) throws SQLException, IOException;
-    Account withdraw(int id, int amount) throws SQLException, IOException, NotEnoughMoneyException;
+    Account balance(int id) throws SQLException, IOException, UnknownAccountException;
+    Account deposit(int id, int amount) throws SQLException, IOException, UnknownAccountException;
+    Account withdraw(int id, int amount) throws SQLException, IOException, NotEnoughMoneyException, UnknownAccountException;
     void transfer(int id1, int id2, int amount) throws SQLException, IOException, NotEnoughMoneyException;
 }
