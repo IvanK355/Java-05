@@ -18,12 +18,12 @@ public class JsonService implements BankService {
     }
 
     @Override
-    public Account balance(int id) throws IOException, UnknownAccountException {
+    public Account balance(int id) throws IOException, NullPointerException, UnknownAccountException {
         try {
 
             return accountDao.read(id);
 
-        } catch (UnknownAccountException e) {
+        } catch (NullPointerException e) {
             throw new UnknownAccountException("Неверный счет");
         }
     }
@@ -31,25 +31,25 @@ public class JsonService implements BankService {
     @Override
     public Account deposit(int id, int amount) throws IOException, UnknownAccountException {
 
-        Account account = accountDao.read(id);
+        Account account = balance(id);
         int newAmount = account.getAccountAmount() + amount;
         return accountDao.update(id, newAmount);
     }
 
     @Override
     public Account withdraw(int id, int amount) throws IOException, UnknownAccountException {
+        Account account = balance(id);
         try {
-            Account account = accountDao.read(id);
             int newAmount = account.getAccountAmount() - amount;
             if (newAmount < 0) {
                 throw new NotEnoughMoneyException("Недостаточно средств");
             }
             return accountDao.update(id, newAmount);
-        } catch (NotEnoughMoneyException | UnknownAccountException e) {
+        } catch (NotEnoughMoneyException e) {
             e.printStackTrace();
             System.out.println("Недостаточно средств");
         }
-        return accountDao.read(id);
+        return null;
     }
 
     @Override

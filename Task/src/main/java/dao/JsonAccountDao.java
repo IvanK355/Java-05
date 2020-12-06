@@ -36,15 +36,12 @@ public class JsonAccountDao implements Dao<Account> {
 
     @Override
     public Account read(int id) throws IOException, NullPointerException, UnknownAccountException {
-        try {
+
             HashMap<Integer, Account> balanceHashMap = readJson();
             String holder = balanceHashMap.get(id).getHolder();
-
             int amount = balanceHashMap.get(id).getAccountAmount();
             return new Account(id, holder, amount);
-        } catch (NullPointerException e) {
-            throw new UnknownAccountException("Неверный счет");
-        }
+
     }
 
     @Override
