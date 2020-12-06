@@ -1,8 +1,0 @@
-DROP TABLE IF EXISTS ACCOUNT;
-CREATE TABLE IF NOT EXISTS ACCOUNT (
-  id INT NOT NULL,
-    name VARCHAR(50) NOT NULL,
-       amount INT NOT NULL
-                  );
-
-
