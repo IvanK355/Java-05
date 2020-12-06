@@ -14,59 +14,66 @@ public class JsonService implements BankService {
 
     @Override
     public void createNewTable() throws IOException {
-        accountDao.createNewTable();
+        accountDao.create();
     }
 
     @Override
-    public Account balance(int id) throws UnknownAccountException, IOException {
+    public Account balance(int id) throws SQLException, UnknownAccountException, IOException {
         try {
-            return accountDao.balance(id);
 
-        } catch (UnknownAccountException | IOException e) {
-            e.printStackTrace();
-            System.out.println("Неверный счет");
-
-        }
-        return accountDao.balance(id);
-    }
-
-    @Override
-    public Account deposit(int id, int amount) throws UnknownAccountException, IOException {
-        try {
-            return accountDao.deposit(id, amount);
+            Account account = accountDao.read(id);
+            if (account.getHolder() == null) {
+                throw new UnknownAccountException("Неверный счет");
+            }
         } catch (UnknownAccountException e) {
             e.printStackTrace();
-            System.out.println("Неверный счет");
         }
-        return accountDao.deposit(id, amount);
+        return accountDao.read(id);
     }
 
     @Override
-    public Account withdraw(int id, int amount) throws NotEnoughMoneyException, UnknownAccountException, IOException {
+    public Account deposit(int id, int amount) throws SQLException, UnknownAccountException, IOException {
+
         try {
-            return accountDao.withdraw(id, amount);
-        } catch (NotEnoughMoneyException e) {
-            e.printStackTrace();
-            System.out.println("Недостаточно средств на счете. Введите новую сумму.");
 
-        } catch (UnknownAccountException | IOException e) {
-            e.printStackTrace();
-            System.out.println("Неверный счет");
+            Account account = accountDao.read(id);
+            int newAmount = account.getAccountAmount() + amount;
 
+            if (account.getHolder() == null) {
+                throw new UnknownAccountException("Неверный счет");
+            }
+            return accountDao.update(id, newAmount);
+        } catch (UnknownAccountException e) {
+            e.printStackTrace();
         }
-        return accountDao.withdraw(id, amount);
+        return accountDao.read(id);
+
     }
 
     @Override
-    public void transfer(int id1, int id2, int amount) {
+    public Account withdraw(int id, int amount) throws SQLException, UnknownAccountException, IOException {
         try {
-            accountDao.transfer(id1, id2, amount);
+            Account account = accountDao.read(id);
+            int newAmount = account.getAccountAmount() - amount;
+            if (newAmount<0) {
+                throw new NotEnoughMoneyException("Недостаточно средств");
+            }
+            return accountDao.update(id, newAmount);
         } catch (NotEnoughMoneyException e) {
             e.printStackTrace();
-            System.out.println("Недостаточно средств на счете. Введите новую сумму.");
+            System.out.println("Недостаточно средств");
+
+        }
+        return accountDao.read(id);
+    }
+
+    @Override
+    public void transfer(int id1, int id2, int amount) throws SQLException {
+        try {
+            withdraw(id1, amount);
+            deposit(id2, amount);
         } catch (UnknownAccountException | IOException e) {
             e.printStackTrace();
-            System.out.println("Неверный счет");
         }
     }
 

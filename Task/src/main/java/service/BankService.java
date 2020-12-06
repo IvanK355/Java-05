@@ -6,7 +6,7 @@ import entities.Account;
 import java.io.IOException;
 import java.sql.SQLException;
 
-public interface BankService extends Dao <Account> {
+public interface BankService {
     void createNewTable() throws IOException;
     Account balance(int id) throws SQLException, IOException, UnknownAccountException;
     Account deposit(int id, int amount) throws SQLException, IOException, UnknownAccountException;

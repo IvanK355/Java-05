@@ -5,6 +5,7 @@ import service.NotEnoughMoneyException;
 import service.UnknownAccountException;
 import utils.DbcpDataSource;
 
+import java.io.IOException;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
@@ -13,17 +14,16 @@ import java.sql.SQLException;
 public class H2AccountDao implements Dao<Account> {
 
     private final String SELECT_QUERY = "SELECT * FROM account WHERE id = ?";
-    private final String UPDATE_DEPOSIT_QUERY = "update account set amount = amount +  ? WHERE id = ?";
-    private final String UPDATE_WITHDRAW_QUERY = "update account set amount = amount -  ? WHERE id = ?";
+    private final String UPDATE_QUERY = "update account set amount = ? WHERE id = ?";
 
 
     @Override
-    public void createNewTable() {
+    public void create() {
         DbcpDataSource.getConnection();
     }
 
     @Override
-    public Account balance(int id) throws SQLException, UnknownAccountException {
+    public Account read (int id) throws SQLException {
         Connection connection;
         PreparedStatement preparedStatement;
         ResultSet resultSet;
@@ -40,54 +40,25 @@ public class H2AccountDao implements Dao<Account> {
         }
         preparedStatement.close();
         connection.close();
-        Account account =new Account(id, name, amount);
-        if (name==null){
-            throw new UnknownAccountException("Исключение создано в H2 метод balance");
-        }
-        return account;
+        return new Account(id, name, amount);
     }
 
     @Override
-    public Account deposit(int id, int amount) throws SQLException, UnknownAccountException {
-        balance(id);
+    public Account update(int id, int amount) throws SQLException, UnknownAccountException {
         Connection connection;
         PreparedStatement preparedStatement;
         connection = DbcpDataSource.getConnection();
-        preparedStatement = connection.prepareStatement(UPDATE_DEPOSIT_QUERY);
+        preparedStatement = connection.prepareStatement(UPDATE_QUERY);
         preparedStatement.setInt(1, amount);
         preparedStatement.setInt(2, id);
         preparedStatement.executeUpdate();
         preparedStatement.close();
         connection.close();
-        return balance(id);
+        return read(id);
     }
 
     @Override
-    public Account withdraw(int id, int amount) throws SQLException, NotEnoughMoneyException, UnknownAccountException {
-        balance(id);
-        Connection connection;
-        PreparedStatement preparedStatement;
-        Account account = balance(id);
-        if((account.getAccountAmount()-amount)<0) {
-            throw new NotEnoughMoneyException("Исключение создано в H2 метод withdraw");
-        }
-
-        connection = DbcpDataSource.getConnection();
-        preparedStatement = connection.prepareStatement(UPDATE_WITHDRAW_QUERY);
-        preparedStatement.setInt(1, amount);
-        preparedStatement.setInt(2, id);
-        preparedStatement.executeUpdate();
-        preparedStatement.close();
-        connection.close();
-        return balance(id);
-    }
-
-    @Override
-    public void transfer(int id1, int id2, int amount) throws SQLException, NotEnoughMoneyException, UnknownAccountException {
-        balance(id1);
-        balance(id2);
-        withdraw(id1, amount);
-        deposit(id2, amount);
-
+    public Account delete(int id, int amount) throws SQLException, IOException, NotEnoughMoneyException, UnknownAccountException {
+        return null;
     }
 }
