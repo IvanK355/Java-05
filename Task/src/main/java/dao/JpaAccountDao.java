@@ -1,12 +1,9 @@
 package dao;
 
 import entities.Account;
-import service.NotEnoughMoneyException;
 import service.UnknownAccountException;
 
 import javax.persistence.*;
-import java.io.IOException;
-import java.sql.SQLException;
 
 public class JpaAccountDao implements Dao<Account> {
     private final String UPDATE_QUERY = "UPDATE Account e SET e.accountAmount = :increment WHERE e.id = :id";
@@ -33,7 +30,7 @@ public class JpaAccountDao implements Dao<Account> {
 
     @Override
     public Account update(int id, int amount) throws UnknownAccountException {
-        Account account = read(id);
+        read(id);
         EntityManager em = emf.createEntityManager();
         em.getTransaction().begin();
 
@@ -48,7 +45,7 @@ public class JpaAccountDao implements Dao<Account> {
     }
 
     @Override
-    public Account delete(int id, int amount) throws SQLException, IOException, NotEnoughMoneyException, UnknownAccountException {
+    public Account delete(int id, int amount) {
         return null;
     }
 }

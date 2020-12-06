@@ -1,11 +1,8 @@
 package dao;
 
 import entities.Account;
-import service.NotEnoughMoneyException;
-import service.UnknownAccountException;
 import utils.DbcpDataSource;
 
-import java.io.IOException;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
@@ -23,7 +20,7 @@ public class H2AccountDao implements Dao<Account> {
     }
 
     @Override
-    public Account read (int id) throws SQLException {
+    public Account read(int id) throws SQLException {
         Connection connection;
         PreparedStatement preparedStatement;
         ResultSet resultSet;
@@ -44,7 +41,7 @@ public class H2AccountDao implements Dao<Account> {
     }
 
     @Override
-    public Account update(int id, int amount) throws SQLException, UnknownAccountException {
+    public Account update(int id, int amount) throws SQLException {
         Connection connection;
         PreparedStatement preparedStatement;
         connection = DbcpDataSource.getConnection();
@@ -58,7 +55,7 @@ public class H2AccountDao implements Dao<Account> {
     }
 
     @Override
-    public Account delete(int id, int amount) throws SQLException, IOException, NotEnoughMoneyException, UnknownAccountException {
+    public Account delete(int id, int amount) {
         return null;
     }
 }
